@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "MIT"
+
+[[mods]]
+    modId = "kingmihailpbroadcast"
+    version = "${file.jarVersion}"
+    displayName = "KingMihailP Broadcast"
+    logoFile = ""
+    description = '''
+        Broadcasts a fully-configurable message to every player on the server
+        at a set time interval. Supports hex colors (#RRGGBB) and named colors.
+        Use /kingmihailptext reload to hot-reload the config without a restart.
+    '''
+
+[[dependencies.kingmihailpbroadcast]]
+    modId = "neoforge"
+    type = "required"
+    versionRange = "[21.1,)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.kingmihailpbroadcast]]
+    modId = "minecraft"
+    type = "required"
+    versionRange = "[1.21.1,1.22)"
+    ordering = "NONE"
+    side = "BOTH"
