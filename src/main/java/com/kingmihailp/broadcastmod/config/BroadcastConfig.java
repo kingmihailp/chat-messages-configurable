@@ -14,12 +14,16 @@ import java.nio.file.Path;
 /**
  * Handles reading and writing the mod's JSON config file.
  *
- * Config location: <minecraft_dir>/config/kingmihailpbroadcast.json
+ * Config location: &lt;minecraft_dir&gt;/config/kingmihailpbroadcast.json
  *
  * Fields:
- *   message          – text sent to all players
- *   color            – hex color string, e.g. "#FF5500", or a Minecraft color name like "white"
- *   interval_seconds – how often the message is broadcast (in seconds, minimum 1)
+ *   message          – text to broadcast; supports inline color codes:
+ *                        &0-&9, &a-&f  legacy Minecraft colors
+ *                        &k &l &m &n &o  formatting (obfuscate/bold/strike/underline/italic)
+ *                        &r             reset formatting
+ *                        &#RRGGBB       24-bit hex color
+ *                        &#RGB          3-digit hex shorthand
+ *   interval_seconds – how often the message fires (seconds, minimum 1)
  */
 public class BroadcastConfig {
 
@@ -28,9 +32,9 @@ public class BroadcastConfig {
             FMLPaths.CONFIGDIR.get().resolve("kingmihailpbroadcast.json");
 
     // ── Default values ──────────────────────────────────────────────────────────
-    private static String  message         = "Hello, welcome to the server!";
-    private static String  color           = "#FFFFFF";
-    private static int     intervalSeconds = 300;
+    private static String message =
+            "&6[Server] &r&#FF4444Welcome &r&#FFAAAAto the &r&#FF8800server&r&6!";
+    private static int intervalSeconds = 300;
 
     // ── Public API ──────────────────────────────────────────────────────────────
 
@@ -45,17 +49,16 @@ public class BroadcastConfig {
             JsonObject json = GSON.fromJson(reader, JsonObject.class);
 
             if (json == null) {
-                BroadcastMod.LOGGER.warn("Config file is empty or invalid – using defaults.");
+                BroadcastMod.LOGGER.warn("[BroadcastMod] Config file is empty or invalid – using defaults.");
                 return;
             }
 
             if (json.has("message"))          message         = json.get("message").getAsString();
-            if (json.has("color"))            color           = json.get("color").getAsString();
             if (json.has("interval_seconds")) intervalSeconds = Math.max(1, json.get("interval_seconds").getAsInt());
 
             BroadcastMod.LOGGER.info(
-                    "[BroadcastMod] Config loaded – message='{}', color='{}', interval={}s",
-                    message, color, intervalSeconds);
+                    "[BroadcastMod] Config loaded – interval={}s, message='{}'",
+                    intervalSeconds, message);
 
         } catch (Exception e) {
             BroadcastMod.LOGGER.error("[BroadcastMod] Failed to read config, keeping previous values.", e);
@@ -63,7 +66,6 @@ public class BroadcastConfig {
     }
 
     public static String getMessage()         { return message; }
-    public static String getColor()           { return color; }
     public static int    getIntervalSeconds() { return intervalSeconds; }
 
     // ── Internals ───────────────────────────────────────────────────────────────
@@ -71,7 +73,6 @@ public class BroadcastConfig {
     private static void writeDefaults() {
         JsonObject json = new JsonObject();
         json.addProperty("message",          message);
-        json.addProperty("color",            color);
         json.addProperty("interval_seconds", intervalSeconds);
 
         try (Writer writer = Files.newBufferedWriter(CONFIG_PATH)) {
