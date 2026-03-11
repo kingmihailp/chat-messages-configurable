@@ -26,7 +26,7 @@ public class BroadcastMod {
 
     private void onServerStarting(ServerStartingEvent event) {
         BroadcastConfig.load();
-        LOGGER.info("KingMihailP Broadcast Mod: config loaded, broadcasting every {} seconds",
-                BroadcastConfig.getIntervalSeconds());
+        LOGGER.info("KingMihailP Broadcast Mod: config loaded, {} message(s) active.",
+                BroadcastConfig.getMessages().size());
     }
 }
